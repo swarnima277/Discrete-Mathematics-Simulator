@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Discrete Math Simulator</title>
+<style>
+:root{--br:#6b4226;--br2:#8b5e3c;--tan:#d9c3ab;--cream:#faf6f1;--line:#eadfd2;--tx:#2e2118}
+*{box-sizing:border-box}body{margin:0;font:15px/1.55 system-ui,Segoe UI,sans-serif;color:var(--tx);background:#fff}
+h1,h2,h3{font-family:Georgia,serif;color:var(--br);margin:0 0 .4em}
+aside{position:fixed;inset:0 auto 0 0;width:250px;background:var(--cream);border-right:1px solid var(--line);padding:20px 14px;overflow:auto}
+.brand{font:700 19px Georgia,serif;color:var(--br);display:block;text-decoration:none;margin-bottom:18px}.brand small{display:block;font:12px system-ui;color:var(--br2)}
+aside h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--br2);margin:16px 8px 6px}
+nav a{display:block;padding:9px 11px;border-radius:9px;color:var(--tx);text-decoration:none;margin-bottom:3px;font-size:14px}
+nav a:hover{background:#f1e6da}nav a.on{background:var(--br);color:#fff}nav a i{font-style:normal;font-size:10px;margin-left:6px;opacity:.7}
+main{margin-left:250px;padding:34px 44px;max-width:1100px}
+.card{border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 18px;background:#fff;box-shadow:0 2px 8px #6b422610}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.hero{background:linear-gradient(135deg,var(--cream),#f1e6da);border:1px solid var(--line);border-radius:18px;padding:32px;margin-bottom:22px}.hero h1{font-size:34px}
+.mod{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:14px;padding:16px;background:#fff;transition:.15s}.mod:hover{border-color:var(--br2);transform:translateY(-2px)}
+.mod b{color:var(--br)}.tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;background:#efe3d6;color:var(--br);margin-bottom:6px}.tag.live{background:var(--br);color:#fff}
+label{font-size:12px;font-weight:600;color:var(--br2);display:block;margin:10px 0 4px}
+input,textarea{width:100%;padding:9px 11px;border:1px solid var(--tan);border-radius:9px;font:inherit;background:#fff}input:focus,textarea:focus{outline:2px solid #c9a98a;border-color:var(--br2)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:110px}
+button{font:inherit;cursor:pointer;border:1px solid var(--br);background:var(--br);color:#fff;padding:9px 16px;border-radius:9px;font-weight:600}button:hover{background:var(--br2)}
+button.o{background:#fff;color:var(--br)}button.o:hover{background:var(--cream)}
+.seg{display:inline-flex;border:1px solid var(--tan);border-radius:10px;overflow:hidden;margin:4px 0}.seg button{border:0;border-radius:0;background:#fff;color:var(--br);padding:7px 14px}.seg button.on{background:var(--br);color:#fff}
+pre{background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font:12.5px/1.5 Consolas,monospace;max-height:320px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}th{background:var(--br);color:#fff;padding:6px 8px;text-align:left}td{padding:5px 8px;border-bottom:1px solid var(--line)}tr:nth-child(even) td{background:var(--cream)}
+.res{background:var(--cream);border-left:4px solid var(--br);padding:12px 14px;border-radius:8px;font:17px Georgia,serif;word-break:break-all}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.chip{background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:5px 11px;font:13px Consolas,monospace}.chip b{color:var(--br2);margin-right:6px}
+.map{font:13px Consolas,monospace;letter-spacing:3px;word-break:break-all}.map span{color:var(--br2)}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 16px}.stage{padding:6px 11px;border-radius:8px;background:#f3ece4;font-size:12.5px;color:#7a6350}.stage.done{background:var(--br);color:#fff}
+.ex{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:6px}.ex p{margin:0;font-size:13.5px}.ex button{margin-top:auto;align-self:flex-start;padding:6px 12px;font-size:13px}
+.ok{color:#2e7d32;font-weight:700}.bad{color:#b3261e;font-weight:700}.hl td{background:#f1e0cc!important;font-weight:600}
+#toast{position:fixed;right:20px;bottom:20px;background:var(--br);color:#fff;padding:11px 18px;border-radius:10px;display:none;max-width:340px;z-index:9}
+ul.t{margin:6px 0 0;padding-left:18px}.soon{background:#fff8ef;border:1px dashed var(--br2);border-radius:12px;padding:14px;color:var(--br)}
+
+/* Units 1-6 simulators: same theme, extra layout helpers */
+.concept{color:#5a4535;margin:0 0 12px;font-size:14px}.use{font-size:13px;color:var(--br2);margin:14px 0 0;border-top:1px dashed var(--line);padding-top:9px}
+.vz{width:100%;max-width:600px;display:block;margin:10px 0;background:#fff;border:1px solid var(--line);border-radius:10px}.vz.wide{max-width:820px}.tw{overflow-x:auto}
+.pl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.pl input[type=range]{flex:1;min-width:140px;padding:0;border:0}.pc{font-size:12.5px;color:var(--br2)}
+.card a:not(.kchip){color:var(--br2)}.simh{color:var(--br);margin:14px 0 4px}.simnote{font-size:13px;color:var(--br2);margin:8px 0 4px}
+.mxg td.cb{cursor:pointer;text-align:center;min-width:34px;user-select:none;border:1px solid var(--line)}.mxg td.cb.on{background:var(--br);color:#fff}.mxg td.cb.add{background:#e6c9a8}.mxg th{text-align:center}
+td.c1{background:#f1e0cc!important}td.c2{background:#d9e8f2!important}td.cg{background:#dcebd8!important}td.cr{background:#f6d9d6!important}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12.5px;font-weight:700;margin:2px 4px 2px 0;background:#efe3d6;color:var(--br)}.badge.y{background:var(--br);color:#fff}.badge.n{background:#f6d9d6;color:#b3261e}
+.kchip.sel{background:var(--br);color:#fff}.gcanvas{cursor:crosshair;touch-action:none}
+code{font:12.5px Consolas,monospace;background:var(--cream);padding:1px 5px;border-radius:5px}
+.card.flash{animation:fl 1.4s}@keyframes fl{0%{box-shadow:0 0 0 4px #c9a98a}100%{box-shadow:0 2px 8px #6b422610}}
+nav details.un{margin:4px 0}nav details.un>summary{cursor:pointer;list-style:none;padding:9px 11px;border-radius:9px;font:700 14px Georgia,serif;color:var(--br)}nav details.un>summary::-webkit-details-marker{display:none}
+nav details.un>summary:hover{background:#f1e6da}nav details.un[open]>summary{background:#efe3d6}nav details.un>summary:before{content:"▸";margin-right:7px;font-size:11px}nav details.un[open]>summary:before{content:"▾"}
+nav .gh{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--br2);margin:10px 8px 3px;font-weight:600}nav details.un a{font-size:13px;padding:5px 11px 5px 16px;margin-bottom:1px;line-height:1.35}
+.ucard .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ucard .links a{font-size:12.5px;padding:3px 10px;border-radius:99px;background:#efe3d6;color:var(--br);text-decoration:none}.ucard .links a:hover{background:var(--br);color:#fff}
+.stat{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px}.stat div{font-size:13px;color:var(--br2)}.stat b{display:block;font:700 26px Georgia,serif;color:var(--br)}
+.mini{width:100%;max-width:300px}.gi{display:flex;gap:12px;flex-wrap:wrap}.gi>div{flex:1;min-width:260px}
+@media(max-width:800px){aside{position:static;width:auto;border:0}main{margin:0;padding:20px}}
+select{width:100%;padding:9px 11px;border:1px solid var(--tan);border-radius:9px;font:inherit;background:#fff}select:focus{outline:2px solid #c9a98a;border-color:var(--br2)}
+.m1res{margin-top:8px}.m1res:empty{display:none}.m1res p{margin:4px 0}.m1res h3{font-size:16px;margin:10px 0 4px}.m1res h3.success{color:#2e7d32}.m1res h3.error,.m1res p.error{color:#b3261e}.m1res p.error{font-weight:600}
+.remainder-class{border:1px solid var(--line);background:var(--cream);border-radius:10px;padding:6px 12px;margin:8px 0}.remainder-class h3{font-size:14px;margin:0}
+/* Members 1 & 2 - application simulators (card 5) */
+[data-m1s][hidden],[data-m2s][hidden]{display:none}#m1_sim_card .seg,#m2_sim_card .seg{flex-wrap:wrap}
+.exbtns{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.simh{color:var(--br);margin:14px 0 4px}.simol{margin:4px 0;padding-left:22px;font-size:14px}.simol li{margin:3px 0}.simnote{font-size:13px;color:var(--br2);margin:8px 0 4px}.simans{font-size:16px;margin:12px 0 4px}.simans.success{color:#2e7d32}.simans.error{color:#b3261e}
+.simflow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}.simstep{padding:6px 11px;border-radius:8px;background:#f3ece4;font-size:12.5px;color:#7a6350;transition:.25s}.simstep.done{background:var(--br);color:#fff}
+.simclockwrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin:12px 0}.simclock{width:200px;height:200px}.simclockwrap .res small{font-size:13px;color:var(--br2)}
+.simstrip{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.wk{flex:1;min-width:48px;text-align:center;padding:8px 4px;border-radius:9px;background:#f3ece4;font-size:13px;color:#7a6350;transition:.2s}.wk small{opacity:.7}.wk.cur{background:var(--br);color:#fff}.wk.end{outline:3px solid #c9a98a}
+.slots{border:1px solid var(--line);border-radius:10px;padding:4px 12px;margin:12px 0}.slot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:32px;border-bottom:1px solid var(--line)}.slot:last-child{border:0}.slot b{width:58px;color:var(--br2);font:12.5px Consolas,monospace}
+.kchip{background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:1px 8px;font:12.5px Consolas,monospace;transition:.2s}.kchip.col{border-color:#b3261e}.kchip.new{background:var(--br);color:#fff}
+.simgears{width:100%;max-height:300px;margin:8px 0}
+.keygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px;margin:10px 0}.kc{border-radius:8px;padding:5px 2px;text-align:center;font:11.5px Consolas,monospace;background:#f6eee6;color:#a08a76;transition:.15s}.kc b{display:block;font-size:14px}.kc.yes{background:var(--br);color:#fff}
+.bars{margin:10px 0}.bar{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:4px 0}.bar span{width:70px;color:var(--br2)}.bar i{display:block;height:14px;background:var(--br);border-radius:4px;transition:width .3s}.bar em{font-style:normal;color:#7a6350}
+.jugs{display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap;margin:14px 0}.jugs p{margin:6px 0 0;font-size:13px;text-align:center}.jug{width:76px;border:3px solid var(--br2);border-top:0;border-radius:0 0 12px 12px;position:relative;overflow:hidden;background:#fff}.jug i{position:absolute;left:0;right:0;bottom:0;background:#8fbcd8;transition:height .35s}
+</style></head><body>
+<aside><a class="brand" href="#home">Discrete Math<br>Simulator<small>Course project</small></a>
+<nav><a href="#home">🏠 Home</a><h4>Syllabus</h4><div id="nav"></div></nav></aside>
+<main>
+<section class="page" id="home"><div class="hero"><h1>Discrete Mathematics, made interactive</h1>
+<p>Every topic of the discrete mathematics syllabus – from sets and logic to graphs and trees – turned into a simulator you can play with. Type your own sets, relations, formulas, groups and graphs and watch Venn diagrams, arrow diagrams, Hasse diagrams, Cayley tables, graph drawings and algorithms respond step by step. Each module also links the idea to a real-world use, such as search engines, databases, secure browsing, scheduling and GPS routing.</p>
+<div class="stat" id="homestat"></div></div>
+<h2>How to use it</h2><div class="grid" style="margin-bottom:22px"><div class="ex"><b>1. Pick a topic</b><p>Use the sidebar: units and sub-topics are listed in syllabus order. Every sub-topic is its own interactive card.</p></div><div class="ex"><b>2. Change the inputs</b><p>Edit the sets, relations, formulas or graphs – or load a preset – and the diagrams redraw instantly.</p></div><div class="ex"><b>3. Follow the working</b><p>Step-by-step tables, animations and counter-examples show <em>why</em> a result holds, not just the answer.</p></div></div>
+<h2>The six units</h2><div class="grid" id="homecards"></div></section>
+
+<section class="page" id="m1" hidden><h1>Modular Arithmetic Calculator &amp; Congruence Solver</h1>
+<p>Arithmetic that “wraps around” like a clock: every result is the remainder after dividing by the modulus n. Work through calculations, congruences, remainder classes and linear congruences step by step.</p>
+<div class="card" id="m1_calc_card"><h3>1. Modular arithmetic calculator</h3>
+<label for="m1_operation">Operation</label><select id="m1_operation"><option value="addition">Modular Addition</option><option value="subtraction">Modular Subtraction</option><option value="multiplication">Modular Multiplication</option><option value="exponentiation">Modular Exponentiation</option></select>
+<div class="row"><div><label for="m1_a">First number (a)</label><input type="number" id="m1_a" value="17" step="1"></div><div><label for="m1_b">Second number / exponent (b)</label><input type="number" id="m1_b" value="5" step="1"></div><div><label for="m1_n">Modulus (n)</label><input type="number" id="m1_n" value="7" min="1" step="1"></div></div>
+<p><button id="m1_calculateBtn">Calculate</button> <button class="o" id="m1_exampleBtn" type="button">Try example</button> <button class="o" id="m1_copyResultBtn" type="button">Copy result</button> <button class="o" id="m1_clearInputsBtn" type="button">Clear inputs</button></p>
+<div class="m1res" id="m1_result"></div>
+<div id="m1_historySection"><h4 style="color:#6b4226;margin:14px 0 4px">Calculation history</h4><ul class="t" id="m1_historyList"></ul><p><button class="o" id="m1_clearHistoryBtn" type="button">Clear history</button></p></div></div>
+<div class="card" id="m1_cong_card"><h3>2. Congruence checker</h3><p style="margin:0">Check whether a ≡ b (mod n).</p>
+<div class="row"><div><label for="m1_congA">a</label><input type="number" id="m1_congA" value="17" step="1"></div><div><label for="m1_congB">b</label><input type="number" id="m1_congB" value="5" step="1"></div><div><label for="m1_congN">Modulus (n)</label><input type="number" id="m1_congN" value="6" min="1" step="1"></div></div>
+<p><button id="m1_checkCongruenceBtn" type="button">Check congruence</button></p><div class="m1res" id="m1_congruenceResult" aria-live="polite"></div></div>
+<div class="card" id="m1_rem_card"><h3>3. Remainder classes visualizer</h3><p style="margin:0">Group integers by their remainder modulo n.</p>
+<div class="row"><div><label for="m1_remainderN">Modulus (n)</label><input type="number" id="m1_remainderN" value="5" min="1" step="1"></div><div><label for="m1_rangeStart">Range start</label><input type="number" id="m1_rangeStart" value="-10" step="1"></div><div><label for="m1_rangeEnd">Range end</label><input type="number" id="m1_rangeEnd" value="10" step="1"></div></div>
+<p><button id="m1_generateClassesBtn" type="button">Generate remainder classes</button></p><div class="m1res" id="m1_remainderResult" aria-live="polite"></div></div>
+<div class="card" id="m1_lin_card"><h3>4. Linear congruence solver</h3><p style="margin:0">Solve ax ≡ b (mod n).</p>
+<div class="row"><div><label for="m1_linearA">Coefficient (a)</label><input type="number" id="m1_linearA" value="3" step="1"></div><div><label for="m1_linearB">Right-hand side (b)</label><input type="number" id="m1_linearB" value="6" step="1"></div><div><label for="m1_linearN">Modulus (n)</label><input type="number" id="m1_linearN" value="9" min="1" step="1"></div></div>
+<p><button id="m1_solveLinearBtn" type="button">Solve congruence</button></p><div class="m1res" id="m1_linearResult" aria-live="polite"></div></div>
+<div class="card" id="m1_sim_card"><h3>5. Real-world application simulator</h3><p style="margin:0">Run the everyday uses of modular arithmetic as live simulations. Every step uses the calculator functions above.</p>
+<div class="seg" data-g="m1sim"><button class="on" data-v="clock">Clock &amp; time zones</button><button data-v="calendar">Calendar</button><button data-v="isbn">ISBN-10 check</button><button data-v="hash">Hash table</button><button data-v="affine">Cipher key</button></div>
+<div class="row" data-m1s="clock"><div><label for="m1s_clock_start">Start time</label><input type="time" id="m1s_clock_start" value="22:15"></div><div><label for="m1s_clock_hours">Hours that pass (negative = earlier)</label><input type="number" id="m1s_clock_hours" value="9.5" step="0.25"></div><div><label for="m1s_clock_zone">Time-zone shift in hours (e.g. 5.5)</label><input type="number" id="m1s_clock_zone" value="5.5" step="0.25"></div></div>
+<div class="row" data-m1s="calendar" hidden><div><label for="m1s_cal_date">Start date</label><input type="date" id="m1s_cal_date"></div><div><label for="m1s_cal_days">Days later (negative = earlier)</label><input type="number" id="m1s_cal_days" value="100" step="1"></div></div>
+<div data-m1s="isbn" hidden><label for="m1s_isbn">ISBN-10 (hyphens optional)</label><input id="m1s_isbn" value="0-306-40615-2"><p><button class="o" id="m1s_isbn_typo" type="button">Simulate a typo</button> <button class="o" id="m1s_isbn_swap" type="button">Swap two neighbouring digits</button></p></div>
+<div class="row" data-m1s="hash" hidden><div style="flex:3"><label for="m1s_hash_keys">Keys to store (numbers or words, comma-separated)</label><input id="m1s_hash_keys" value="1021, 1044, 1066, 1087, 1093, 1110, 1128, 1152, apple, mango, kiwi"></div><div><label for="m1s_hash_m">Table size m (1–50)</label><input type="number" id="m1s_hash_m" value="7" min="1" step="1"></div></div>
+<div class="row" data-m1s="affine" hidden><div><label for="m1s_aff_a">Multiplier a</label><input type="number" id="m1s_aff_a" value="5" step="1"></div><div><label for="m1s_aff_b">Shift b</label><input type="number" id="m1s_aff_b" value="8" step="1"></div><div style="flex:3"><label for="m1s_aff_msg">Secret message</label><input id="m1s_aff_msg" value="Meet at noon"></div></div>
+<p><button id="m1s_go" type="button">Run simulation ▶</button></p><div id="m1s_out" aria-live="polite"></div></div>
+<h2>Real-world examples <small style="font-size:13px;color:#8b5e3c">(click “Try it” – they run live)</small></h2><div class="grid" id="ex1"></div></section>
+
+<section class="page" id="m2" hidden><h1>Number Theory Toolkit</h1>
+<p>GCD and LCM, the Euclidean and Extended Euclidean algorithms, modular inverses, prime factorization and Euler’s φ function – the toolbox behind the Affine cipher and RSA.</p>
+<div class="card" id="m2_gcd_card"><h3>1. GCD, LCM &amp; Euclidean algorithm</h3>
+<div class="row"><div><label>a</label><input id="m2_gcd_a" type="number" value="84"></div><div><label>b</label><input id="m2_gcd_b" type="number" value="126"></div></div>
+<p><button id="m2_gcd_go">Compute GCD &amp; LCM</button></p><div id="m2_gcd_out"></div></div>
+<div class="card" id="m2_eg_card"><h3>2. Extended Euclidean algorithm</h3>
+<div class="row"><div><label>a</label><input id="m2_eg_a" type="number" value="240"></div><div><label>b</label><input id="m2_eg_b" type="number" value="46"></div></div>
+<p><button id="m2_eg_go">Find Bézout coefficients</button></p><div id="m2_eg_out"></div></div>
+<div class="card" id="m2_inv_card"><h3>3. Modular inverses</h3>
+<div class="row"><div><label>a</label><input id="m2_inv_a" type="number" value="17"></div><div><label>modulus n (≥ 2)</label><input id="m2_inv_n" type="number" value="3120"></div></div>
+<p><button id="m2_inv_go">Find inverses</button></p><div id="m2_inv_out"></div></div>
+<div class="card" id="m2_f_card"><h3>4. Prime factorization &amp; Euler’s φ</h3>
+<div class="row"><div><label>n (≥ 2)</label><input id="m2_f_n" type="number" value="360"></div></div>
+<p><button id="m2_f_go">Factor n &amp; compute φ(n)</button></p><div id="m2_f_out"></div></div>
+<div class="card" id="m2_sim_card"><h3>5. Real-world application simulator</h3><p style="margin:0">See GCDs, inverses and factoring at work in real situations. Every number comes from the toolkit above.</p>
+<div class="seg" data-g="m2sim"><button class="on" data-v="gears">Meshing gears</button><button data-v="keys">Affine cipher keys</button><button data-v="rsa">RSA private key</button><button data-v="attack">Factoring attack</button><button data-v="jugs">Water-jug puzzle</button></div>
+<div class="row" data-m2s="gears"><div><label for="m2s_gear_a">Teeth on gear A (4–200)</label><input type="number" id="m2s_gear_a" value="12"></div><div><label for="m2s_gear_b">Teeth on gear B (4–200)</label><input type="number" id="m2s_gear_b" value="20"></div></div>
+<div class="row" data-m2s="keys" hidden><div><label for="m2s_keys_m">Alphabet size m (2–200)</label><input type="number" id="m2s_keys_m" value="26"></div></div>
+<div class="row" data-m2s="rsa" hidden><div><label for="m2s_rsa_p">Prime p</label><input type="number" id="m2s_rsa_p" value="61"></div><div><label for="m2s_rsa_q">Prime q</label><input type="number" id="m2s_rsa_q" value="53"></div><div><label for="m2s_rsa_e">Public exponent e</label><input type="number" id="m2s_rsa_e" value="17"></div><div><label for="m2s_rsa_m">Test message M (&lt; n)</label><input type="number" id="m2s_rsa_m" value="65"></div></div>
+<div class="row" data-m2s="attack" hidden><div><label for="m2s_atk_digits">Largest modulus to attack (4–13 digits)</label><input type="number" id="m2s_atk_digits" value="13"></div></div>
+<div class="row" data-m2s="jugs" hidden><div><label for="m2s_jug_a">Jug A capacity (L)</label><input type="number" id="m2s_jug_a" value="3"></div><div><label for="m2s_jug_b">Jug B capacity (L)</label><input type="number" id="m2s_jug_b" value="5"></div><div><label for="m2s_jug_c">Measure exactly (L)</label><input type="number" id="m2s_jug_c" value="4"></div></div>
+<p><button id="m2s_go" type="button">Run simulation ▶</button></p><div id="m2s_out" aria-live="polite"></div></div>
+<h2>Real-world examples <small style="font-size:13px;color:#8b5e3c">(click “Try it” – they run live)</small></h2><div class="grid" id="ex2"></div></section>
+
+<section class="page" id="m3" hidden><h1>Classical Cryptography Simulator</h1>
+<p>Caesar and Affine ciphers, built on modular arithmetic: letters become numbers A=0 … Z=25, and every step is mod 26.</p>
+<div class="card" id="m3sim"><div class="seg" data-g="c3"><button class="on" data-v="caesar">Caesar</button><button data-v="affine">Affine</button><button data-v="brute">Brute-force attack</button></div>
+<div class="seg" data-g="md" id="m3md"><button class="on" data-v="encrypt">Encrypt</button><button data-v="decrypt">Decrypt</button></div>
+<label id="m3ml">Message</label><textarea id="msg" rows="2">Hello World</textarea>
+<div class="row" id="f-caesar"><div><label>Key k (0–25)</label><input id="k" type="number" value="3"></div></div>
+<div class="row" id="f-affine" hidden><div><label>a (coprime with 26)</label><input id="a" type="number" value="5"></div><div><label>b (0–25)</label><input id="b" type="number" value="8"></div></div>
+<p><button id="m3go">Run</button></p><div id="m3out"></div></div>
+<h2>Real-world examples <small style="font-size:13px;color:#8b5e3c">(click “Try it” – they run live)</small></h2><div class="grid" id="ex3"></div></section>
+
+<section class="page" id="m4" hidden><h1>RSA Cryptography Simulator</h1>
+<p>The public-key system behind HTTPS, secure email and software signing: primes → n, φ(n) → keys e, d (via Extended Euclid) → modular exponentiation.</p>
+<div class="flow" id="flow"></div>
+<div class="card" id="m4sim"><h3>1. Generate keys</h3>
+<div class="row"><div><label>p (prime, optional)</label><input id="p"></div><div><label>q (prime, optional)</label><input id="q"></div><div><label>e (optional)</label><input id="e"></div><div><label>random bits (4–24)</label><input id="bits" type="number" value="10"></div></div>
+<p><button id="kg">Generate keys</button> <span style="font-size:13px;color:#8b5e3c">Leave p/q blank for random primes.</span></p>
+<div class="chips" id="kchips"></div><details><summary>Show full derivation</summary><pre id="kdet"></pre></details></div>
+<div class="card"><h3>2. Use the keys</h3><div class="seg" data-g="tool"><button class="on" data-v="ed">Encrypt / Decrypt</button><button data-v="sig">Sign / Verify</button><button data-v="atk">Break a weak key</button></div>
+<div id="t-ed"><div class="seg" data-g="m4mode"><button class="on" data-v="text">Text</button><button data-v="number">Number</button></div>
+<div class="row"><div><label>Plaintext (text, or number m &lt; n)</label><input id="m4in" value="Hello"><p><button id="enc">Encrypt →</button></p></div>
+<div><label>Ciphertext</label><input id="m4c"><p><button id="dec">← Decrypt</button></p></div><div><label>Recovered plaintext</label><input id="m4p" readonly></div></div></div>
+<div id="t-sig" hidden><label>Message / file name</label><input id="smsg" value="update-v2.4.1.bin">
+<p><button id="sg">Sign (private key d)</button></p><label>Signature</label><input id="ssig"><p><button class="o" id="vf">Verify (public key e)</button> <span id="vres"></span></p></div>
+<div id="t-atk" hidden><p>An attacker sees only the public key (e, n). If n is small they can factor it and rebuild d.</p><button id="at">Factor n &amp; recover private key</button></div>
+<div id="m4out"></div></div>
+<h2>Real-world examples <small style="font-size:13px;color:#8b5e3c">(click “Try it” – they run live)</small></h2><div class="grid" id="ex4"></div></section>
+</main><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3800)};
+async function api(n,b){const r=await fetch('/api/'+n,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();if(!r.ok)throw new Error(j.error);return j}
+const guard=f=>async(...a)=>{try{await f(...a);return true}catch(e){toast(e.message);return false}};
+const val=g=>$(`[data-g=${g}] .on`).dataset.v;
+const pick=(g,v)=>$(`[data-g=${g}] [data-v=${v}]`).click();
+$$('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('button');if(!b)return;s.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));sync()});
+function sync(){const c=val('c3'),br=c==='brute';$('#f-caesar').hidden=c!=='caesar';$('#f-affine').hidden=c!=='affine';$('#m3md').hidden=br;$('#m3ml').textContent=br?'Intercepted ciphertext (Caesar)':'Message';
+$('#t-ed').hidden=val('tool')!=='ed';$('#t-sig').hidden=val('tool')!=='sig';$('#t-atk').hidden=val('tool')!=='atk'}
+/* ---- router: #page or #page/card ; the sidebar and home cards are built by modules/ui/nav.js ---- */
+function go(){const h=location.hash.slice(1)||'home',[p,sec]=h.split('/');$$('.page').forEach(x=>x.hidden=x.id!==p);
+$$('nav a').forEach(a=>a.classList.toggle('on',a.hash==='#'+h));const on=$('nav a.on');if(on){const d=on.closest('details');if(d)d.open=true}
+const t=sec&&document.getElementById(sec);if(t){t.scrollIntoView();t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')}else scrollTo(0,0)}
+addEventListener('hashchange',go);go();
+const exCards=(el,L)=>{$(el).innerHTML=L.map((x,i)=>`<div class="ex"><span class="tag">${x.tag}</span><b>${x.t}</b><p>${x.d}</p><button data-i="${i}">Try it ▶</button></div>`).join('');
+$(el).onclick=e=>{const b=e.target.closest('button');if(b)L[b.dataset.i].run()}};
+/* ---- Member 3 ---- */
+const table=(h,r,hl=-1)=>`<table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map((x,i)=>`<tr class="${i===hl?'hl':''}">${x.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+const COMMON=/\b(the|and|at|will|to|of|is|we|you|in|a|it)\b/gi;
+const runM3=guard(async()=>{const c=val('c3'),message=$('#msg').value;
+if(c==='brute'){const r=await api('m3_brute',{message}),sc=r.rows.map(x=>(x[1].match(COMMON)||[]).length),best=sc.indexOf(Math.max(...sc));
+$('#m3out').innerHTML=`<p><b>All 26 shifts</b> – the likely plaintext is highlighted (most common English words):</p>`+table(['Key','Decrypted text'],r.rows,best);return}
+const r=await api('m3_run',{cipher:c,mode:val('md'),message,key:$('#k').value,a:$('#a').value,b:$('#b').value});
+const A='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+$('#m3out').innerHTML=`<div class="res">${esc(r.result)}</div><p style="font-size:13px;color:#8b5e3c">${esc(r.info)}</p>
+<div class="map">Plain &nbsp;<span>${A}</span><br>Cipher <span>${r.map}</span></div><h4 style="color:#6b4226;margin:14px 0 0">Step-by-step</h4>`+table(['Input','Number','Formula','Result','Output'],r.steps)});
+$('#m3go').onclick=runM3;
+const m3set=async o=>{pick('c3',o.cipher);if(o.mode)pick('md',o.mode);$('#msg').value=o.message;if(o.k!=null)$('#k').value=o.k;if(o.a!=null){$('#a').value=o.a;$('#b').value=o.b}
+$('#m3sim').scrollIntoView({behavior:'smooth'});await runM3()};
+exCards('#ex3',[
+{tag:'History · Military',t:'Julius Caesar’s dispatches',d:'Roman generals sent orders shifted 3 letters so a captured scroll looked like nonsense. Here “Veni, vidi, vici” is shifted by 3.',run:()=>m3set({cipher:'caesar',mode:'encrypt',message:'Veni, vidi, vici',k:3})},
+{tag:'Internet · Forums',t:'ROT13 spoiler hiding',d:'Online forums hide spoilers and puzzle answers with ROT13 (shift 13). Because 13 is half of 26, encrypting twice decodes it.',run:()=>m3set({cipher:'caesar',mode:'encrypt',message:'The butler did it!',k:13})},
+{tag:'Radio · 1930s–40s',t:'Secret decoder badges',d:'Radio-serial fan clubs gave kids badges that shifted letters to reveal “secret” messages. Shown with shift 5.',run:()=>m3set({cipher:'caesar',mode:'encrypt',message:'Drink your Ovaltine',k:5})},
+{tag:'Ancient · Hebrew scribes',t:'Atbash cipher',d:'Atbash (A↔Z, B↔Y…) was used by Hebrew scribes over 2,000 years ago. It is the Affine cipher with a=25, b=25.',run:()=>m3set({cipher:'affine',mode:'encrypt',message:'Meet at the station at noon',a:25,b:25})},
+{tag:'Cryptanalysis',t:'Cracking an intercepted message',d:'With only 26 possible keys a Caesar cipher falls to brute force in seconds. Try all shifts on an intercepted message.',run:()=>m3set({cipher:'brute',message:'Wkh hdjoh zloo odqg dw gdzq'})}]);
+/* ---- Member 4 ---- */
+$('#flow').innerHTML=['p, q','n = p·q','φ(n)','choose e','d = e⁻¹','Encrypt','Decrypt'].map((s,i)=>`<span class="stage">${s}</span>${i<6?'→':''}`).join('');
+const stage=n=>$$('.stage').forEach((s,i)=>s.classList.toggle('done',i<n));
+let K=null;const kv=()=>{if(!K)throw new Error('Generate keys first.');return K};
+const out=r=>$('#m4out').innerHTML=(r.table?table(r.table.h,r.table.r):'')+`<details open><summary>Step-by-step workings</summary><pre>${esc(r.steps.join('\n'))}</pre></details>`;
+const genKey=guard(async()=>{const r=await api('keygen',{p:$('#p').value,q:$('#q').value,e:$('#e').value,bits:$('#bits').value});K=r.key;
+$('#kchips').innerHTML=['p','q','n','phi','e','d'].map(x=>`<div class="chip"><b>${x==='phi'?'φ(n)':x}</b>${K[x]}</div>`).join('')+`<div class="chip"><b>public</b>(${K.e}, ${K.n})</div><div class="chip"><b>private</b>(${K.d}, ${K.n})</div>`;
+$('#kdet').textContent=r.steps.join('\n');stage(5)});
+$('#kg').onclick=genKey;
+const enc=guard(async()=>{const k=kv(),r=await api('encrypt',{mode:val('m4mode'),value:$('#m4in').value,e:k.e,n:k.n});$('#m4c').value=r.cipher;
+if(r.table)r.table={h:['Char','Code m','c = mᵉ mod n'],r:r.table};out(r);stage(6)});
+const dec=guard(async()=>{const k=kv(),r=await api('decrypt',{mode:val('m4mode'),value:$('#m4c').value,d:k.d,n:k.n});$('#m4p').value=r.plain;
+if(r.table)r.table={h:['Cipher c','m = cᵈ mod n','Char'],r:r.table};out(r);stage(7)});
+const sign=guard(async()=>{const k=kv(),r=await api('sign',{message:$('#smsg').value,d:k.d,n:k.n});$('#ssig').value=r.signature;$('#vres').textContent='';out({steps:[`hash(message) mod n = ${r.hash}`,...r.steps]})});
+const verify=guard(async()=>{const k=kv(),r=await api('verify',{message:$('#smsg').value,signature:$('#ssig').value,e:k.e,n:k.n});
+$('#vres').innerHTML=r.valid?'<span class="ok">✔ Signature valid – message is authentic</span>':'<span class="bad">✘ Invalid – message or signature was altered</span>';out({steps:[`hash(message) mod n = ${r.hash}`,...r.steps]})});
+const attack=guard(async()=>{const k=kv(),r=await api('attack',{e:k.e,n:k.n});out(r)});
+$('#enc').onclick=enc;$('#dec').onclick=dec;$('#sg').onclick=sign;$('#vf').onclick=verify;$('#at').onclick=attack;
+const m4try=async(o,fn)=>{$('#p').value=o.p;$('#q').value=o.q;$('#e').value=o.e;pick('tool',o.tool);if(o.mode)pick('m4mode',o.mode);
+$('#m4sim').scrollIntoView({behavior:'smooth'});if(await genKey())await fn()};
+exCards('#ex4',[
+{tag:'Web · HTTPS/TLS',t:'Secure browsing handshake',d:'Your browser picks a random session key and encrypts it with the website’s public key (e = 65537, like real TLS certificates). Only the server’s private key recovers it. Demo key 123456.',run:()=>m4try({p:1009,q:1013,e:65537,tool:'ed',mode:'number'},async()=>{$('#m4in').value='123456';await enc();await dec()})},
+{tag:'Email · PGP',t:'Private email',d:'PGP/GPG lets anyone encrypt mail with your public key; only your private key opens it. Here a short message is encrypted char by char, then decrypted.',run:()=>m4try({p:2003,q:2011,e:65537,tool:'ed',mode:'text'},async()=>{$('#m4in').value='Meet me at 5 PM';await enc();await dec()})},
+{tag:'Software · Code signing',t:'Trusting a software update',d:'Vendors sign updates with a private key; your device verifies with the public key. Signature is checked, so any tampering is caught. Edit the message and Verify to see it fail.',run:()=>m4try({p:1009,q:1013,e:65537,tool:'sig'},async()=>{$('#smsg').value='update-v2.4.1.bin';await sign();await verify()})},
+{tag:'Security · FREAK attack',t:'Why small keys are dangerous',d:'In 2015 the FREAK attack exploited servers still accepting weak 512-bit “export” RSA keys, which can be factored. Same idea on a toy key: factor n, rebuild d.',run:()=>m4try({p:10007,q:10009,e:65537,tool:'atk'},attack)}]);
+sync();
+</script>
+<script src="/modules/member1/member1.js"></script>
+<script src="/modules/member1/member1_examples.js"></script>
+<script src="/modules/member2/member2.js"></script>
+<script src="/modules/member1/member1_sim.js"></script>
+<script src="/modules/member2/member2_sim.js"></script>
+<script src="/modules/ui/common.js"></script>
+<script src="/modules/ui/graph.js"></script>
+<script src="/modules/unit1/sets.js"></script>
+<script src="/modules/unit1/relations.js"></script>
+<script src="/modules/unit1/posets.js"></script>
+<script src="/modules/unit1/logic.js"></script>
+<script src="/modules/unit1/functions.js"></script>
+<script src="/modules/unit2/recursion.js"></script>
+<script src="/modules/unit2/counting.js"></script>
+<script src="/modules/unit3/structures.js"></script>
+<script src="/modules/unit3/groups.js"></script>
+<script src="/modules/unit4/numtheory.js"></script>
+<script src="/modules/unit5/graphs.js"></script>
+<script src="/modules/unit6/trees.js"></script>
+<script src="/modules/unit6/paths.js"></script>
+<script src="/modules/ui/nav.js"></script>
+</body></html>
