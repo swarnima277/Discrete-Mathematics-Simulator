@@ -199,7 +199,10 @@ class H(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
+    on_render = "PORT" in os.environ                      # Render sets PORT; locally it is unset
+    host = "0.0.0.0" if on_render else "127.0.0.1"        # Render needs 0.0.0.0 to reach the app
     url = f"http://localhost:{port}"
-    print(f"Discrete Math Simulator running at {url}  (Ctrl+C to stop)")
-    threading.Timer(0.8, lambda: webbrowser.open(url)).start()
-    ThreadingHTTPServer(("127.0.0.1", port), H).serve_forever()
+    print(f"Discrete Math Simulator running on {host}:{port}  (Ctrl+C to stop)")
+    if not on_render:
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+    ThreadingHTTPServer((host, port), H).serve_forever()
